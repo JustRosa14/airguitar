@@ -31,5 +31,7 @@
 *.out
 *.app
 
-.pio\build/
+.pio/
 .vscode/
+test/
+platformio.ini

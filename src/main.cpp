@@ -10,7 +10,7 @@ void setup() {
   Serial.begin(9600);
   Serial.flush();
   Serial.println("Hello, World! Waiting a few seconds");
-  delay()
+  delay(3000);
   analogWrite(D3, 0);
   
 }
