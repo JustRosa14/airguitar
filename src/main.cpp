@@ -9,7 +9,7 @@ int lastFourValues[4] = {0, 0, 0, 0};
 void setup() {
   Serial.begin(9600);
   Serial.flush();
-  Serial.println("Hello, World!");
+  Serial.println("Hello, World! 2");
 
   analogWrite(D3, 0);
   
