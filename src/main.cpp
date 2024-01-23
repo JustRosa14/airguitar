@@ -8,6 +8,9 @@ int lastFourValues[4] = {0, 0, 0, 0};
 
 void setup() {
   Serial.begin(9600);
+  Serial.flush();
+  Serial.println("Hello, World!");
+
   analogWrite(D3, 0);
   
 }
@@ -60,7 +63,7 @@ void loop() {
     delay(1000);
     analogWrite(D3, 0);
   }else{
-    //Serial.println("Not making noise");
+    Serial.println("Not making noise");
   }
 
   //delay(200);  // Adjust the delay based on your requirements
