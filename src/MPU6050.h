@@ -4,9 +4,11 @@
 #include <Wire.h>
 #define MPU6050_ADDR 0x68 // MPU6050 I2C address
 
-#define CORRECTION_X_AXIS 5900
-#define CORRECTION_Y_AXIS 400
-#define CORRECTION_Z_AXIS 300
+#define ACCEL_X_CORRECTION 500
+#define ACCEL_Y_CORRECTION 250
+#define ACCEL_Z_CORRECTION -50
+
+
 
 struct gyroData {
     int16_t x;
@@ -15,9 +17,9 @@ struct gyroData {
 };
 
 struct accelData {
-    int x;
-    int y;
-    int z;
+    int16_t x;
+    int16_t y;
+    int16_t z;
 };
 
 class Gyro

@@ -1,7 +1,14 @@
 #include <Arduino.h>
-
+#include <stdbool.h>
 #include "MPU6050.h"
-#define PRINT_TRIGGER
+#include "frequencies.h"
+
+#define KNOP4 D4
+#define KNOP3 D7
+#define KNOP2 D6
+#define KNOP1 D5
+
+void visualizeData(bool gyro, bool accel);
 
 accelData accel_data;
 gyroData  gyro_data;
@@ -11,26 +18,69 @@ Gyro g;
 void setup() {
   Serial.begin(9600);
   Serial.flush();
-  Serial.println("Hello, World! Waiting a few seconds");
-  delay(2000);
-  analogWrite(D3, 0);
+  Serial.print("Hello, World! Waiting a few seconds..");
+
+  Serial.print("v\n");
+
+  pinMode(D5, INPUT_PULLUP);
+  pinMode(D6, INPUT_PULLUP);
+  pinMode(D7, INPUT_PULLUP);
+  pinMode(D4, INPUT_PULLUP);
+  pinMode(D3, OUTPUT);
   
   g = Gyro();
+
 }
 
 void loop() {
-  
+  //visualizeData(0, 1);
+
+
+  bool x_condition = false;
+  bool y_condition= false;
+  bool z_condition = false;
+  bool makeNoise = false;
+
+
   accel_data = g.getAccelData();
-  gyro_data = g.getGyroData();
+  if(accel_data.y < -10000){
+    for(int i=0;i<10;i++){
+      accel_data = g.getAccelData();
+      visualizeData(0, 1);
+      if(accel_data.x < -15000){
+        x_condition = true;
+        Serial.println("x_condition Done");
+      }
+      if(x_condition){
+        break;
+      }
+    }
 
-  Serial.print("AccelX: "); Serial.print(accel_data.x);
-  Serial.print("\tAccelY: "); Serial.print(accel_data.y);
-  Serial.print("\tAccelZ: "); Serial.print(accel_data.z);
+    if(x_condition){
+      makeNoise = true;
+    }
+  }
 
- //currently the "gyro" data seems to represent the accel data, check this
-   Serial.print("\tGyroX: "); Serial.print(gyro_data.x);
-   Serial.print("\tGyroY: "); Serial.print(gyro_data.y);
-   Serial.print("\tGyroZ: "); Serial.println(gyro_data.z);
+
+  if(makeNoise){
+    Serial.println("Making noise");
+    if(!digitalRead(KNOP4)){
+      tone(D3, fE4, 200);
+    }else if(!digitalRead(KNOP3)){
+      tone(D3, fA4, 200);
+    }else if(!digitalRead(KNOP2)){
+      tone(D3, fD5, 200);
+    }else if(!digitalRead(KNOP1)){
+      tone(D3, fG5, 200);
+    }    
+    else{
+      tone(D3, fB3, 200);
+    }
+  }
+
+  
+
+  
 
   //buttonread
   //if(digitalRead(D5)){
@@ -41,49 +91,35 @@ void loop() {
 }
 
 void analyzeStrum(){
-  int makeNoise = 0;
-  int x_condition = 0;
-  int y_condition = 0;
-  int z_condition = 0;
   accelData data = g.getAccelData();
 
-  if(data.y < 10000){
-    Serial.println("Triggered!"); 
-    for(int i=0;i<10;i++){
-      data = g.getAccelData();
-#ifdef PRINT_TRIGGER
-      Serial.print("AccelX: "); Serial.print(data.x);
-      Serial.print("\tAccelY: "); Serial.print(data.y);
-      Serial.print("\tAccelZ: "); Serial.println(data.z);
-#endif
-      if(data.z < 10000){
-        z_condition = 1;
-      }
 
-      if(data.y > 10000){
-        y_condition = 1;
-      }
-
-      if(z_condition && (data.z > 10000  || y_condition)){
-        
-        makeNoise = 1;
-      }
-
-    }
-    x_condition = 0;
-    y_condition = 0;
-    z_condition = 0; 
-  }
-
-  if(makeNoise){
-    Serial.println("Making noise");
-    analogWrite(D3, 250);
-    delay(1000);
-    analogWrite(D3, 0);
-  }
-  //delay(200);  // Adjust the delay based on your requirements
 }
 
+void visualizeData(bool gyro, bool accel){
+  Gyro t = Gyro();
+  if(accel){
+      accel_data = g.getAccelData();
+      Serial.print("AccelX: "); Serial.print(accel_data.x);
+      Serial.print("\tAccelY: "); Serial.print(accel_data.y);
+      Serial.print("\tAccelZ: "); Serial.print(accel_data.z);
+      if(!gyro){
+        Serial.print("\n");
+      }
+  }
+  if(gyro){
+      gyro_data = g.getGyroData();
+      if(accel){
+        Serial.print("\t");
+      }
+      Serial.print("GyroX: "); Serial.print(gyro_data.x);
+      Serial.print("\tGyroY: "); Serial.print(gyro_data.y);
+      Serial.print("\tGyroZ: "); Serial.println(gyro_data.z);
+  }
+
+
+
+}
 
 
 
