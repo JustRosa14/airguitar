@@ -9,6 +9,8 @@
 #define KNOP1 D5
 
 void visualizeData(bool gyro, bool accel);
+bool analyzeStrum();
+void makeNoise(bool noise);
 
 accelData accel_data;
 gyroData  gyro_data;
@@ -35,48 +37,11 @@ void setup() {
 void loop() {
   //visualizeData(0, 1);
 
-
-  bool x_condition = false;
-  bool y_condition= false;
-  bool z_condition = false;
-  bool makeNoise = false;
+  makeNoise(analyzeStrum());
 
 
-  accel_data = g.getAccelData();
-  if(accel_data.y < -10000){
-    for(int i=0;i<10;i++){
-      accel_data = g.getAccelData();
-      visualizeData(0, 1);
-      if(accel_data.x < -15000){
-        x_condition = true;
-        Serial.println("x_condition Done");
-      }
-      if(x_condition){
-        break;
-      }
-    }
 
-    if(x_condition){
-      makeNoise = true;
-    }
-  }
-
-
-  if(makeNoise){
-    Serial.println("Making noise");
-    if(!digitalRead(KNOP4)){
-      tone(D3, fE4, 200);
-    }else if(!digitalRead(KNOP3)){
-      tone(D3, fA4, 200);
-    }else if(!digitalRead(KNOP2)){
-      tone(D3, fD5, 200);
-    }else if(!digitalRead(KNOP1)){
-      tone(D3, fG5, 200);
-    }    
-    else{
-      tone(D3, fB3, 200);
-    }
-  }
+  
 
   
 
@@ -90,10 +55,47 @@ void loop() {
 
 }
 
-void analyzeStrum(){
-  accelData data = g.getAccelData();
+void makeNoise(bool noise){
+  if(noise){
+      Serial.println("Making noise");
+      if(!digitalRead(KNOP4)){
+        tone(D3, fE4, 200);
+      }else if(!digitalRead(KNOP3)){
+        tone(D3, fA4, 200);
+      }else if(!digitalRead(KNOP2)){
+        tone(D3, fD5, 200);
+      }else if(!digitalRead(KNOP1)){
+        tone(D3, fG5, 200);
+      }    
+      else{
+        tone(D3, fB3, 200);
+      }
+    }
+}
 
+bool analyzeStrum(){
+  bool x_condition = false;
+  bool y_condition= false;
+  bool z_condition = false;
 
+  accel_data = g.getAccelData();
+  if(accel_data.y < -10000){
+    for(int i=0;i<10;i++){
+      accel_data = g.getAccelData();
+      visualizeData(0, 1);
+      if(accel_data.x < -15000){
+        x_condition = true;
+        Serial.println("x_condition Done");
+      }
+      if(x_condition){
+        return true;
+      }
+    }
+
+    
+
+  }
+  return false;
 }
 
 void visualizeData(bool gyro, bool accel){
